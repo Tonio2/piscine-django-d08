@@ -23,12 +23,25 @@ To get started with this project, follow these steps:
    ```bash
    docker run --rm -p 6379:6379 redis:7
    ```
-4. **Start app**
+4. **Setup DB**
 
    Open a new terminal and type
    ```bash
    cd d08
    python manage.py makemigrations chat
    python manage.py migrate
+   ```
+
+5. **Create user**
+
+   To create users, load data from users_fixture.json
+   ```bash
+   python manage.py loaddata users_fixture.json
+   ```
+
+6. **Start server**
+
+   ```bash
    python manage.py runserver
    ```
+
