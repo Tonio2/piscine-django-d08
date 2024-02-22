@@ -88,7 +88,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 "type": "chat_message",
-                "message": f"{self.user.username} has left the chat",
+                "message": "has left the chat",
+                "username": self.user.username,
             },
         )
         # Leave room group
