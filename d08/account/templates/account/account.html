@@ -1,0 +1,78 @@
+{% extends 'account/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <div id="login-section" {% if request.user.is_authenticated %}style="display: none;" {% endif %}>
+    <div id="login-error" class="pb-0 alert alert-danger" style="display: none;"></div>
+    <form id="login-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+  </div>
+
+  <!-- Section pour l'utilisateur connecté -->
+  <div id="logout-section" {% if not request.user.is_authenticated %}style="display: none;" {% endif %}>
+    <p>Logged as <span id="user-name">{% if request.user.is_authenticated %}{{ request.user.username }}{% endif %}</span></p>
+    <button id="logout-button" class="btn btn-danger">Logout</button>
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+
+    function clearFormErrors() {
+      $('#login-error').hide().html('')
+    }
+
+    // Function to display form errors
+    function displayFormErrors(errors) {
+      console.log(errors)
+      html = ''
+      for (const field in errors) {
+        if (errors.hasOwnProperty(field)) {
+          const fieldError = errors[field][0].message; // Taking the first error message
+          html += "<p>" + fieldError + "</p>"
+        }
+      }
+      $('#login-error').show().html(html)
+    }
+
+    // Soumission du formulaire de connexion
+    $('#login-form').submit(function (e) {
+      e.preventDefault()
+      clearFormErrors();
+      $.ajax({
+        url: '/account/ajax_login/',
+        type: 'POST',
+        data: {
+          username: $('input[name=username]').val(),
+          password: $('input[name=password]').val()
+        },
+        success: function (response) {
+          if (response.success) {
+            $('#user-name').text(response.username)
+            $('#login-section').hide()
+            $('#logout-section').show()
+          } else {
+            displayFormErrors(JSON.parse(response.error))
+          }
+        }
+      })
+    })
+
+    // Bouton de déconnexion
+    $('#logout-button').click(function () {
+      $.ajax({
+        url: '/account/ajax_logout/',
+        type: 'POST',
+        success: function (response) {
+          if (response.success) {
+            $('#login-section').show()
+            $('#logout-section').hide()
+          }
+        }
+      })
+    })
+  });
+</script>
+{% endblock %}
